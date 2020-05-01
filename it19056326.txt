@@ -1,0 +1,104 @@
+IT19056326
+DMS ASSIGNMENT 2
+s.p.p.p.wanigarathne
+Malabe group 6.1
+Topic28_A2_IT19056326
+
+
+
+
+
+
+
+PART 01
+
+a.	
+Query 01
+
+Select schedule id and event id between 2010-07-01 and 2015-07-01 from the schedule table.
+ 
+Query 02
+
+Display all details in schedule table where schedule id in which between start time 12:00:00 and 14:00:00.
+
+Query 03
+
+Display the number of notification for each client where number of notification of each client greater than 5.
+
+b.	
+Query 01
+
+select shedule_id, title
+from shedule 
+where Event_date between '2010-07-01' and '2015-07-01'
+
+Query 02
+
+select * 
+from shedule 
+where shedule_id in ( select shedule_id from shedule where start_time between '12:00:00' and '14:00:00' )
+
+Query 03
+
+select count(noti_id) as numberOfNotification, client_id 
+from notification
+group by client_id
+having count(noti_id) > 5
+
+
+part 2
+ 
+c.	 
+
+1.
+Create view for display the event title for each notification. View table must display event title , notification id and comment.
+2.
+create view EventNotification as
+select e.event_title, n.noti_id, n.comment
+from event e, notification n 
+where n.event_id = e.event_id
+
+d.	  
+
+1.
+Create procedure for get number of time schedule for given venue id.
+2. 
+create procedure spGetSheduleIdCountByVenueId
+@venue_id int,
+@sheduleIdCount int output 
+as begin
+	select @sheduleIdCount = count(shedule_id)
+	from shedule
+	where venue_id = @venue_id
+end
+
+
+
+e.	
+
+1.	
+Each client have only 2 phone numbers. This trigger make sure that there can only be 2 phone numbers for each client. When enter more than 2 phone numbers for each client this trigger display error massage. 
+
+2.	
+
+create trigger tr_clientPhone
+on client_phone
+for insert,update
+as
+begin
+
+declare @count int
+declare @client_id int
+select @count = count(phone_id), @client_id = client_id
+from client_phone
+group by client_id
+
+if @count>2
+begin
+	print 'you have reached the maximum number of phone numbers for client '
+	print(@client_id)
+	rollback transaction 
+end
+end
+
+
